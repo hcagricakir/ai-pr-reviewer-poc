@@ -2,6 +2,7 @@ package dev.prreviewer.github;
 
 import dev.prreviewer.review.ReviewFinding;
 import dev.prreviewer.review.ReviewReport;
+import dev.prreviewer.review.ReviewAction;
 import dev.prreviewer.review.Severity;
 import org.junit.jupiter.api.Test;
 
@@ -55,6 +56,7 @@ class GitHubReviewPublisherTest {
                 "github-pr:42",
                 "summary",
                 "concerns",
+                ReviewAction.COMMENT,
                 List.of(first, second, skipped),
                 List.of(),
                 List.of("policy")
@@ -89,5 +91,42 @@ class GitHubReviewPublisherTest {
         assertThat(body).contains("**[high] Null guard regression**");
         assertThat(body).contains("Problem: Null can reach compareTo.");
         assertThat(body).contains("Confidence: 0.99");
+    }
+
+    @Test
+    void shouldRenderRequestChangesReviewBody() {
+        ReviewFinding finding = new ReviewFinding(
+                Severity.HIGH,
+                "Null guard regression",
+                "Null can reach compareTo.",
+                "This changes the method contract.",
+                "Restore the null check.",
+                0.99,
+                "src/main/java/example/Foo.java",
+                6,
+                9
+        );
+        ReviewReport report = new ReviewReport(
+                "review-2",
+                Instant.now(),
+                "mock",
+                "github-pr:42",
+                "Blocking issue detected.",
+                "blocked",
+                ReviewAction.REQUEST_CHANGES,
+                List.of(finding),
+                List.of("Mock provider was used."),
+                List.of("policy")
+        );
+
+        String body = GitHubReviewPublisher.renderReviewBody(
+                report,
+                GitHubReviewPublisher.buildCommentDrafts(report)
+        );
+
+        assertThat(body).contains(GitHubReviewPublisher.REVIEW_MARKER);
+        assertThat(body).contains("- Overall assessment: blocked");
+        assertThat(body).contains("- Review action: request_changes");
+        assertThat(body).contains("Blocking issue detected.");
     }
 }

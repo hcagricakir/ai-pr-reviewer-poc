@@ -37,6 +37,7 @@ public final class ReviewOrchestrator {
                 .sorted(Comparator.comparing((ReviewFinding finding) -> finding.severity().ordinal()))
                 .limit(agentProfile.review().maxFindings())
                 .toList();
+        ReviewAction reviewAction = resolveReviewAction(payload, findings);
 
         return new ReviewReport(
                 UUID.randomUUID().toString(),
@@ -45,9 +46,20 @@ public final class ReviewOrchestrator {
                 reviewInput.sourceType() + ":" + reviewInput.sourceId(),
                 payload.summary(),
                 payload.overallAssessment(),
+                reviewAction,
                 findings,
                 payload.notes(),
                 policySet.policyIds()
         );
+    }
+
+    private ReviewAction resolveReviewAction(NormalizedReviewPayload payload, List<ReviewFinding> findings) {
+        if (findings.isEmpty()) {
+            return ReviewAction.COMMENT;
+        }
+        if ("blocked".equalsIgnoreCase(payload.overallAssessment())) {
+            return ReviewAction.REQUEST_CHANGES;
+        }
+        return payload.reviewAction();
     }
 }

@@ -14,3 +14,4 @@ Output contract:
 {{OUTPUT_CONTRACT}}
 
 Respect the configured severity vocabulary and confidence scale.
+Do not choose request_changes unless the diff contains concrete, actionable issues that should block merge.
