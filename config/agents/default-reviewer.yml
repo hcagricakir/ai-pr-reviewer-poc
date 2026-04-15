@@ -1,0 +1,29 @@
+metadata:
+  id: default-reviewer
+  name: Default Policy-Driven Reviewer
+  description: Baseline reviewer profile for backend-oriented pull request diffs.
+  tags:
+    - generic
+    - java
+    - backend
+
+review:
+  promptTemplate: classpath:templates/reviewer-system-prompt.md
+  activePolicies:
+    - policies/base/review-principles.yml
+    - policies/base/clean-code-rules.yml
+    - policies/base/severity-map.yml
+    - policies/base/output-contract.yml
+    - policies/profiles/java-backend.yml
+  focusAreas:
+    - correctness
+    - edge cases
+    - maintainability
+    - operational risk
+  onlyActionableFindings: true
+  maxFindings: 10
+  minimumConfidence: 0.55
+
+output:
+  formatter: markdown
+  includePolicySummary: true

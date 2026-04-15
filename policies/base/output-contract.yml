@@ -1,0 +1,20 @@
+metadata:
+  id: output-contract
+  description: Output expectations for normalized findings.
+  precedence: 40
+
+outputContract:
+  summaryStyle: concise
+  noFindingBehavior: Return an empty findings array when no actionable issue exists and explain that briefly in the summary.
+  confidenceScale: 0.0 to 1.0
+  requiredFields:
+    - severity
+    - title
+    - problem
+    - whyItMatters
+    - recommendation
+    - confidence
+    - filePath
+    - startLine
+    - endLine
+  lineReferenceGuidance: When an exact line is unclear from the diff, omit line numbers instead of guessing.

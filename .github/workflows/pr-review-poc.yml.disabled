@@ -1,0 +1,41 @@
+name: AI PR Review POC
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build CLI
+        run: ./mvnw -q -DskipTests package
+
+      - name: Run PR review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO_NAME: ${{ github.event.repository.name }}
+          GITHUB_BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+        run: |
+          java -jar target/ai-pr-reviewer-poc.jar \
+            review \
+            --config config/application.example.yml \
+            --github-pr ${{ github.event.pull_request.number }} \
+            --provider openai \
+            --output-format markdown

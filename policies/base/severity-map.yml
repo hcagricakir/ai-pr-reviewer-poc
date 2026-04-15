@@ -1,0 +1,11 @@
+metadata:
+  id: severity-map
+  description: Default severity vocabulary used by the normalized review report.
+  precedence: 30
+
+severityMapping:
+  critical: Immediate production or security risk. Should block merge.
+  high: Likely bug, regression, or materially unsafe behavior. Should be fixed before merge.
+  medium: Meaningful maintainability or performance issue worth fixing soon.
+  low: Minor but actionable issue with limited blast radius.
+  info: Contextual note or follow-up that does not need to block merge.

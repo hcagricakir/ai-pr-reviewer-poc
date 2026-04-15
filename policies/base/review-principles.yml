@@ -1,0 +1,18 @@
+metadata:
+  id: review-principles
+  description: Generic review principles independent from language or domain.
+  precedence: 10
+
+principles:
+  - id: correctness-first
+    title: Correctness before style
+    guidance: Focus on bugs, regressions, broken contracts, and unsafe assumptions before style comments.
+  - id: evidence-driven
+    title: Evidence-driven findings
+    guidance: Report only findings that are directly supported by the diff or the provided change context.
+  - id: actionable-feedback
+    title: Actionable feedback only
+    guidance: Each finding should explain the problem, why it matters, and a concrete next step.
+  - id: avoid-noise
+    title: Avoid low-signal nitpicks
+    guidance: Do not report optional preferences or speculative issues unless they have clear engineering impact.

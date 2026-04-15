@@ -1,0 +1,19 @@
+metadata:
+  id: domain-template
+  description: Example file teams can copy to add project or domain specific review context.
+  precedence: 90
+
+principles:
+  - id: replace-me
+    title: Replace me
+    guidance: Add domain-specific constraints here, for example payment integrity, inventory consistency, or privacy controls.
+
+checks:
+  - id: replace-me-check
+    title: Replace me
+    guidance: Add a concrete domain-specific review rule here.
+    severityHint: high
+
+domainOverrides:
+  your-domain:
+    - Add short domain-specific rules that the reviewer should always keep in context.

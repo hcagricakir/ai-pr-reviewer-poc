@@ -1,0 +1,23 @@
+metadata:
+  id: java-backend-profile
+  description: Java backend specific review hints layered on top of the base policy set.
+  precedence: 50
+
+checks:
+  - id: optional-usage
+    title: Optional usage and null semantics
+    guidance: Watch for Optional being converted back to null, nullable method contracts becoming ambiguous, or repository lookups being dereferenced without checks.
+    severityHint: high
+  - id: collection-handling
+    title: Collection and stream usage
+    guidance: Review stream pipelines, loops, and collection copies for redundant work, repeated lookups, and hidden complexity.
+    severityHint: medium
+  - id: boundary-validation
+    title: Boundary validation
+    guidance: Validate request parameters, IDs, and command objects before deeper business logic or I/O calls.
+    severityHint: high
+
+domainOverrides:
+  java-backend:
+    - Prefer findings tied to behavior, contracts, state transitions, persistence interactions, and transaction-safe design.
+    - Treat framework-level annotations, nullability assumptions, and collection semantics as first-class review signals.

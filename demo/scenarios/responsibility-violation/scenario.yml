@@ -1,0 +1,9 @@
+scenario:
+  id: responsibility-violation
+  title: Responsibility violation in service layer
+  description: Expands a service method to orchestrate persistence, payment, notification, and auditing in one place.
+
+changes:
+  - path: src/main/java/com/acme/order/OrderPlacementService.java
+    base: base/OrderPlacementService.java
+    head: head/OrderPlacementService.java

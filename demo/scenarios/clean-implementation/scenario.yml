@@ -1,0 +1,10 @@
+scenario:
+  id: clean-implementation
+  title: Clean implementation addition
+  description: Adds a small, focused implementation with explicit naming and clear edge handling.
+
+changes:
+  - path: src/main/java/com/acme/pricing/DeliveryFeePolicy.java
+    base: ""
+    head: head/DeliveryFeePolicy.java
+    changeType: added

@@ -1,0 +1,9 @@
+scenario:
+  id: null-edge-case
+  title: Null and edge case regression
+  description: Introduces nullable control flow after a repository lookup and dereferences the nullable path.
+
+changes:
+  - path: src/main/java/com/acme/customer/CustomerLookupService.java
+    base: base/CustomerLookupService.java
+    head: head/CustomerLookupService.java

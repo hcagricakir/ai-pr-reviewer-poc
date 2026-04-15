@@ -1,0 +1,9 @@
+scenario:
+  id: performance-smell
+  title: Performance smell in collection handling
+  description: Replaces a batched lookup with a repository call inside a loop.
+
+changes:
+  - path: src/main/java/com/acme/report/InventoryProjectionService.java
+    base: base/InventoryProjectionService.java
+    head: head/InventoryProjectionService.java

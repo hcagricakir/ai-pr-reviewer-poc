@@ -1,0 +1,28 @@
+metadata:
+  id: clean-code-rules
+  description: Generic code quality signals for maintainable change review.
+  precedence: 20
+
+checks:
+  - id: naming-clarity
+    title: Meaningful naming
+    guidance: Flag vague, misleading, or abbreviated identifiers that hide intent or increase cognitive load.
+    severityHint: medium
+    examples:
+      - Variable names like x1, tmp, data, val, or method names like doStuff.
+  - id: null-and-edge-handling
+    title: Null safety and edge handling
+    guidance: Look for unchecked nullable values, empty collections, missing validation, and unsafe assumptions on external inputs.
+    severityHint: high
+  - id: single-responsibility
+    title: Focused responsibilities
+    guidance: Flag changes that mix orchestration, persistence, validation, formatting, networking, or notification concerns in one place without clear boundaries.
+    severityHint: medium
+  - id: performance-smells
+    title: Performance-sensitive logic
+    guidance: Look for repeated expensive calls, unnecessary scans, duplicated conversions, or O(n*m) patterns introduced by the change.
+    severityHint: medium
+  - id: operational-readiness
+    title: Operational signals
+    guidance: Call out missing error handling, silent failures, missing guardrails, or changes that make incidents harder to observe.
+    severityHint: high

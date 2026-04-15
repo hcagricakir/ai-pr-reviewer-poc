@@ -1,0 +1,9 @@
+scenario:
+  id: naming-problem
+  title: Naming quality regression
+  description: Replaces meaningful names with vague identifiers and a generic method name.
+
+changes:
+  - path: src/main/java/com/acme/checkout/CheckoutService.java
+    base: base/CheckoutService.java
+    head: head/CheckoutService.java

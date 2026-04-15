@@ -1,0 +1,35 @@
+review:
+  provider: mock
+  agentProfile: config/agents/default-reviewer.yml
+  outputFormat: markdown
+  maxFiles: 25
+  maxDiffCharacters: 30000
+  includePatterns:
+    - "**/*.java"
+    - "**/*.kt"
+    - "**/*.yml"
+    - "**/*.yaml"
+    - "**/*.xml"
+  excludePatterns:
+    - "**/target/**"
+    - "**/build/**"
+    - "**/generated/**"
+    - "**/*.md"
+
+providers:
+  openai:
+    apiKey: ${OPENAI_API_KEY:}
+    baseUrl: ${OPENAI_BASE_URL:https://api.openai.com}
+    model: ${OPENAI_MODEL:gpt-5.4-mini}
+    reasoningEffort: ${OPENAI_REASONING_EFFORT:low}
+    timeoutSeconds: 90
+
+github:
+  apiBaseUrl: ${GITHUB_API_BASE_URL:https://api.github.com}
+  owner: ${GITHUB_REPO_OWNER:}
+  repo: ${GITHUB_REPO_NAME:}
+  token: ${GITHUB_TOKEN:}
+  defaultBaseBranch: ${GITHUB_BASE_BRANCH:main}
+
+demo:
+  scenariosDir: demo/scenarios
