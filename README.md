@@ -394,7 +394,7 @@ The current repository state already includes:
 - prompt template and JSON schema
 - sample scenarios
 - tests
-- disabled GitHub workflow example
+- active GitHub workflow with inline review comment publishing
 - helper script for demo scenario materialization
 
 That is the intended first commit boundary.
