@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write
 
     steps:
       - name: Checkout
@@ -58,4 +58,5 @@ jobs:
             --config config/application.example.yml \
             --github-pr "${PR_NUMBER}" \
             --provider openai \
+            --publish-github-review-comments \
             --output-format markdown

@@ -195,6 +195,24 @@ Run:
 java -jar target/ai-pr-reviewer-poc.jar review --github-pr 123 --provider openai
 ```
 
+### 5.a Publish inline review comments to GitHub
+
+When you want the CLI to publish actionable findings directly onto PR lines:
+
+```bash
+java -jar target/ai-pr-reviewer-poc.jar \
+  review \
+  --github-pr 123 \
+  --provider openai \
+  --publish-github-review-comments \
+  --output-format markdown
+```
+
+This uses the GitHub pull request review comments API and requires:
+
+- `GITHUB_TOKEN`
+- repository `pull-requests: write` permission for the workflow/job token
+
 ### 6. Print the assembled prompt without calling AI
 
 ```bash
@@ -295,21 +313,27 @@ without rewriting the core review flow.
 
 ## GitHub Integration Next Steps
 
-An example workflow is included at:
+The repository includes an active workflow at:
 
-- `.github/workflows/pr-review-poc.yml.disabled`
+- `.github/workflows/pr-review-poc.yml`
 
-It is intentionally disabled so secrets and provider decisions stay under your control.
+Current workflow behavior:
 
-Typical next step after repository creation:
+1. builds the CLI
+2. reviews the target PR
+3. prints the normalized markdown report into the action log
+4. publishes inline PR review comments for findings that have valid file and line anchors
 
-1. rename the file to `pr-review-poc.yml`
-2. add repository secrets
-3. decide whether to keep markdown output only or post review comments in a follow-up iteration
+Required repository setup:
+
+1. add `OPENAI_API_KEY` as a repository secret
+2. allow the workflow job token to use `pull-requests: write`
+3. open PRs from branches inside the same repository if you want secrets to be available
 
 ## Known Limitations
 
-- The GitHub input path currently fetches PR files and patch text, but it does not post comments back to GitHub.
+- The GitHub input path now posts inline review comments, but only for findings that have a file path plus line anchor.
+- Re-runs on the same commit avoid duplicating previously published bot comments, but older comments on previous commits are not cleaned up automatically.
 - Only `mock` and `openai` providers are wired in v1.
 - There is no token-aware chunking yet; the current guardrail is file count plus total diff character limit.
 - The mock provider is heuristic-only and exists to validate the pipeline, not to replace real model review.
@@ -317,7 +341,7 @@ Typical next step after repository creation:
 
 ## Roadmap / Next Steps
 
-- post findings back to GitHub as PR comments or check-run output
+- add PR summary reviews or check-run output in addition to inline comments
 - add provider-specific retry and rate-limit handling
 - add diff chunking and multi-pass review for large PRs
 - add richer project/domain override packs
@@ -370,7 +394,7 @@ The current repository state already includes:
 - prompt template and JSON schema
 - sample scenarios
 - tests
-- disabled GitHub workflow example
+- active GitHub workflow with inline review comment publishing
 - helper script for demo scenario materialization
 
 That is the intended first commit boundary.
