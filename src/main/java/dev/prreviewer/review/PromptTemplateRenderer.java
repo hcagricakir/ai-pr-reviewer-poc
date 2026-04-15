@@ -102,7 +102,9 @@ public final class PromptTemplateRenderer {
                         "- No finding behavior: " + contract.noFindingBehavior(),
                         "- Confidence scale: " + contract.confidenceScale(),
                         "- Required fields: " + String.join(", ", contract.requiredFields()),
-                        "- Line references: " + contract.lineReferenceGuidance()
+                        "- Line references: " + contract.lineReferenceGuidance(),
+                        "- Allowed review actions: " + String.join(", ", contract.allowedReviewActions()),
+                        "- Review action guidance: " + contract.reviewActionGuidance()
                 )
         );
     }

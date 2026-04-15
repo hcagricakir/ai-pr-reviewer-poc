@@ -89,12 +89,20 @@ public final class PolicyLoader {
         String lineReferenceGuidance = override.lineReferenceGuidance().isBlank()
                 ? base.lineReferenceGuidance()
                 : override.lineReferenceGuidance();
+        List<String> allowedReviewActions = override.allowedReviewActions().isEmpty()
+                ? base.allowedReviewActions()
+                : override.allowedReviewActions();
+        String reviewActionGuidance = override.reviewActionGuidance().isBlank()
+                ? base.reviewActionGuidance()
+                : override.reviewActionGuidance();
         return new PolicyDocument.OutputContract(
                 summaryStyle,
                 noFindingBehavior,
                 confidenceScale,
                 requiredFields,
-                lineReferenceGuidance
+                lineReferenceGuidance,
+                allowedReviewActions,
+                reviewActionGuidance
         );
     }
 }

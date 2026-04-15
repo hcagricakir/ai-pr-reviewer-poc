@@ -61,7 +61,7 @@ public final class ReviewCommand implements Callable<Integer> {
 
     @Option(
             names = "--publish-github-review-comments",
-            description = "Publish actionable findings as inline review comments on the target GitHub pull request."
+            description = "Submit a GitHub pull request review with inline comments and either COMMENT or REQUEST_CHANGES."
     )
     private boolean publishGitHubReviewComments;
 
@@ -117,11 +117,22 @@ public final class ReviewCommand implements Callable<Integer> {
         if (publishGitHubReviewComments) {
             validateGitHubPublishInputs();
             GitHubReviewPublisher.PublishResult publishResult = new GitHubReviewPublisher(applicationConfig.github())
-                    .publishInlineComments(githubPullRequest, report);
-            System.err.println(
-                    "Published %d inline GitHub review comments. Skipped %d findings."
-                            .formatted(publishResult.publishedComments(), publishResult.skippedFindings())
-            );
+                    .publishReview(githubPullRequest, report);
+            if (publishResult.submittedReview()) {
+                System.err.println(
+                        "Submitted GitHub review with event %s and %d inline comments. Skipped %d findings."
+                                .formatted(
+                                        publishResult.reviewAction().githubEvent(),
+                                        publishResult.publishedComments(),
+                                        publishResult.skippedFindings()
+                                )
+                );
+            } else {
+                System.err.println(
+                        "No GitHub review submitted. Skipped %d findings."
+                                .formatted(publishResult.skippedFindings())
+                );
+            }
             if (!publishResult.notes().isEmpty()) {
                 publishResult.notes().forEach(note -> System.err.println("GitHub publish note: " + note));
             }

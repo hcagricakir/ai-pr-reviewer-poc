@@ -13,6 +13,7 @@ public final class MarkdownReviewOutputFormatter implements ReviewOutputFormatte
         builder.append("- Provider: ").append(reviewReport.provider()).append('\n');
         builder.append("- Source: ").append(reviewReport.source()).append('\n');
         builder.append("- Overall assessment: ").append(reviewReport.overallAssessment()).append('\n');
+        builder.append("- Review action: ").append(reviewReport.reviewAction().apiValue()).append('\n');
         builder.append("- Applied policies: ").append(String.join(", ", reviewReport.appliedPolicies())).append('\n');
         builder.append('\n');
         builder.append("## Summary\n\n");

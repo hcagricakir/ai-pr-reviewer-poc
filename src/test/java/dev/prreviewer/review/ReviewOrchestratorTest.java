@@ -21,6 +21,7 @@ class ReviewOrchestratorTest {
 
         assertThat(report.findings()).isEmpty();
         assertThat(report.overallAssessment()).isEqualTo("no_findings");
+        assertThat(report.reviewAction()).isEqualTo(ReviewAction.COMMENT);
     }
 
     @Test
@@ -30,6 +31,16 @@ class ReviewOrchestratorTest {
         assertThat(report.findings()).isNotEmpty();
         assertThat(report.findings()).extracting(ReviewFinding::title)
                 .contains("Potential repeated expensive call inside loop");
+        assertThat(report.reviewAction()).isEqualTo(ReviewAction.COMMENT);
+    }
+
+    @Test
+    void shouldRequestChangesForBlockingNullRegressionSample() {
+        ReviewReport report = runSample("null-edge-case");
+
+        assertThat(report.findings()).isNotEmpty();
+        assertThat(report.overallAssessment()).isEqualTo("blocked");
+        assertThat(report.reviewAction()).isEqualTo(ReviewAction.REQUEST_CHANGES);
     }
 
     private ReviewReport runSample(String sampleId) {

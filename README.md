@@ -64,8 +64,9 @@ High-level flow:
 3. Policy files are merged into one resolved review policy set.
 4. Prompt context is assembled from the policy set plus the diff.
 5. The selected AI provider returns structured JSON.
-6. The JSON is normalized into `ReviewReport`.
+6. The JSON is normalized into `ReviewReport`, including the review action recommendation.
 7. The selected formatter prints markdown or JSON output.
+8. When GitHub publishing is enabled, the tool submits one PR review with inline comments and a `COMMENT` or `REQUEST_CHANGES` event.
 
 ## Project Layout
 
@@ -197,7 +198,7 @@ java -jar target/ai-pr-reviewer-poc.jar review --github-pr 123 --provider openai
 
 ### 5.a Publish inline review comments to GitHub
 
-When you want the CLI to publish actionable findings directly onto PR lines:
+When you want the CLI to publish a real GitHub PR review with actionable findings on PR lines:
 
 ```bash
 java -jar target/ai-pr-reviewer-poc.jar \
@@ -208,10 +209,12 @@ java -jar target/ai-pr-reviewer-poc.jar \
   --output-format markdown
 ```
 
-This uses the GitHub pull request review comments API and requires:
+This uses the GitHub pull request reviews API and requires:
 
 - `GITHUB_TOKEN`
 - repository `pull-requests: write` permission for the workflow/job token
+
+If the normalized review action is `request_changes`, the submitted PR review event is `REQUEST_CHANGES`. Otherwise the event is `COMMENT`.
 
 ### 6. Print the assembled prompt without calling AI
 
@@ -223,6 +226,7 @@ java -jar target/ai-pr-reviewer-poc.jar review --sample performance-smell --dry-
 
 The normalized review output supports:
 
+- `reviewAction`
 - `severity`
 - `title`
 - `problem`
@@ -322,7 +326,8 @@ Current workflow behavior:
 1. builds the CLI
 2. reviews the target PR
 3. prints the normalized markdown report into the action log
-4. publishes inline PR review comments for findings that have valid file and line anchors
+4. submits a PR review with inline comments for findings that have valid file and line anchors
+5. uses `REQUEST_CHANGES` when the normalized review action says the PR should not merge without fixes
 
 Required repository setup:
 
@@ -332,7 +337,8 @@ Required repository setup:
 
 ## Known Limitations
 
-- The GitHub input path now posts inline review comments, but only for findings that have a file path plus line anchor.
+- The GitHub input path now submits a review with inline comments, but only for findings that have a file path plus line anchor.
+- If all findings on a rerun are duplicates or lack line anchors, no new GitHub review is submitted.
 - Re-runs on the same commit avoid duplicating previously published bot comments, but older comments on previous commits are not cleaned up automatically.
 - Only `mock` and `openai` providers are wired in v1.
 - There is no token-aware chunking yet; the current guardrail is file count plus total diff character limit.
@@ -341,7 +347,7 @@ Required repository setup:
 
 ## Roadmap / Next Steps
 
-- add PR summary reviews or check-run output in addition to inline comments
+- add richer review actions such as `APPROVE` or policy-based escalation thresholds
 - add provider-specific retry and rate-limit handling
 - add diff chunking and multi-pass review for large PRs
 - add richer project/domain override packs

@@ -3,8 +3,10 @@ package dev.prreviewer.ai;
 import dev.prreviewer.diff.DiffLineLocator;
 import dev.prreviewer.diff.DiffSection;
 import dev.prreviewer.review.NormalizedReviewPayload;
+import dev.prreviewer.review.ReviewAction;
 import dev.prreviewer.review.ReviewContext;
 import dev.prreviewer.review.ReviewFinding;
+import dev.prreviewer.review.Severity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,14 +93,22 @@ public final class MockReviewProvider implements AiReviewProvider {
             return new NormalizedReviewPayload(
                     "No actionable findings based on the current review heuristics.",
                     "no_findings",
+                    ReviewAction.COMMENT,
                     List.of(),
                     List.of("Mock provider was used. Replace with OpenAI for model-backed review.")
             );
         }
 
+        boolean shouldRequestChanges = findings.stream()
+                .map(ReviewFinding::severity)
+                .anyMatch(severity -> severity == Severity.CRITICAL || severity == Severity.HIGH);
+
         return new NormalizedReviewPayload(
-                "The change set contains actionable issues worth addressing before merge.",
-                "concerns",
+                shouldRequestChanges
+                        ? "The change set contains blocking issues that should be fixed before merge."
+                        : "The change set contains actionable issues worth addressing before merge.",
+                shouldRequestChanges ? "blocked" : "concerns",
+                shouldRequestChanges ? ReviewAction.REQUEST_CHANGES : ReviewAction.COMMENT,
                 findings,
                 List.of("Mock provider was used. Findings are heuristic and intended for local flow validation.")
         );

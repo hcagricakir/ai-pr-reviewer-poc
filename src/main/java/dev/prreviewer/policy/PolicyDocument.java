@@ -84,7 +84,9 @@ public record PolicyDocument(
             String noFindingBehavior,
             String confidenceScale,
             List<String> requiredFields,
-            String lineReferenceGuidance
+            String lineReferenceGuidance,
+            List<String> allowedReviewActions,
+            String reviewActionGuidance
     ) {
         @JsonCreator
         public OutputContract(
@@ -92,17 +94,21 @@ public record PolicyDocument(
                 @JsonProperty("noFindingBehavior") String noFindingBehavior,
                 @JsonProperty("confidenceScale") String confidenceScale,
                 @JsonProperty("requiredFields") List<String> requiredFields,
-                @JsonProperty("lineReferenceGuidance") String lineReferenceGuidance
+                @JsonProperty("lineReferenceGuidance") String lineReferenceGuidance,
+                @JsonProperty("allowedReviewActions") List<String> allowedReviewActions,
+                @JsonProperty("reviewActionGuidance") String reviewActionGuidance
         ) {
             this.summaryStyle = summaryStyle == null ? "concise" : summaryStyle;
             this.noFindingBehavior = noFindingBehavior == null ? "" : noFindingBehavior;
             this.confidenceScale = confidenceScale == null ? "0.0 to 1.0" : confidenceScale;
             this.requiredFields = requiredFields == null ? List.of() : List.copyOf(requiredFields);
             this.lineReferenceGuidance = lineReferenceGuidance == null ? "" : lineReferenceGuidance;
+            this.allowedReviewActions = allowedReviewActions == null ? List.of() : List.copyOf(allowedReviewActions);
+            this.reviewActionGuidance = reviewActionGuidance == null ? "" : reviewActionGuidance;
         }
 
         public static OutputContract defaults() {
-            return new OutputContract(null, null, null, null, null);
+            return new OutputContract(null, null, null, null, null, null, null);
         }
     }
 }

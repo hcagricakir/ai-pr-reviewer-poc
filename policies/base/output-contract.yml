@@ -8,6 +8,7 @@ outputContract:
   noFindingBehavior: Return an empty findings array when no actionable issue exists and explain that briefly in the summary.
   confidenceScale: 0.0 to 1.0
   requiredFields:
+    - reviewAction
     - severity
     - title
     - problem
@@ -18,3 +19,7 @@ outputContract:
     - startLine
     - endLine
   lineReferenceGuidance: When an exact line is unclear from the diff, omit line numbers instead of guessing.
+  allowedReviewActions:
+    - comment
+    - request_changes
+  reviewActionGuidance: Use request_changes only when the supported findings are strong enough that the change should not merge without fixes. Use comment for non-blocking concerns or when no actionable issue exists.

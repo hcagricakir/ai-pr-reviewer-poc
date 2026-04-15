@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dev.prreviewer.config.ApplicationConfig;
+import dev.prreviewer.review.ReviewAction;
 import dev.prreviewer.review.ReviewFinding;
 import dev.prreviewer.review.ReviewReport;
 import dev.prreviewer.util.ObjectMappers;
@@ -28,6 +29,7 @@ import java.util.Set;
 public final class GitHubReviewPublisher {
 
     static final String COMMENT_MARKER = "<!-- ai-pr-reviewer-poc -->";
+    static final String REVIEW_MARKER = "<!-- ai-pr-reviewer-poc-review -->";
     private static final String BOT_LOGIN = "github-actions[bot]";
 
     private final ApplicationConfig.GitHubConfig gitHubConfig;
@@ -40,16 +42,22 @@ public final class GitHubReviewPublisher {
                 .build();
     }
 
-    public PublishResult publishInlineComments(int pullRequestNumber, ReviewReport reviewReport) {
+    public PublishResult publishReview(int pullRequestNumber, ReviewReport reviewReport) {
         validateGitHubConfig();
         PullRequestSnapshot pullRequestSnapshot = loadPullRequestSnapshot(pullRequestNumber);
         List<CommentDraft> drafts = buildCommentDrafts(reviewReport);
         if (drafts.isEmpty()) {
-            return new PublishResult(0, reviewReport.findings().size(), List.of("No findings had enough file and line context for inline comments."));
+            return new PublishResult(
+                    false,
+                    reviewReport.reviewAction(),
+                    0,
+                    reviewReport.findings().size(),
+                    List.of("No findings had enough file and line context for a GitHub review submission.")
+            );
         }
 
         Set<CommentFingerprint> existingFingerprints = loadExistingFingerprints(pullRequestNumber);
-        int publishedComments = 0;
+        List<CommentDraft> draftsToPublish = new ArrayList<>();
         int skippedFindings = 0;
         List<String> notes = new ArrayList<>();
 
@@ -59,13 +67,29 @@ public final class GitHubReviewPublisher {
                 notes.add("Skipped duplicate inline comment for %s:%d".formatted(draft.path(), draft.line()));
                 continue;
             }
-            createReviewComment(pullRequestNumber, pullRequestSnapshot.headSha(), draft);
-            publishedComments++;
+            draftsToPublish.add(draft);
         }
 
+        if (draftsToPublish.isEmpty()) {
+            return new PublishResult(
+                    false,
+                    reviewReport.reviewAction(),
+                    0,
+                    skippedFindings,
+                    List.copyOf(new LinkedHashSet<>(notes))
+            );
+        }
+
+        createReview(pullRequestNumber, pullRequestSnapshot.headSha(), reviewReport, draftsToPublish);
         int totalDraftFindings = drafts.stream().mapToInt(draft -> draft.findings().size()).sum();
         skippedFindings += reviewReport.findings().size() - totalDraftFindings;
-        return new PublishResult(publishedComments, skippedFindings, List.copyOf(new LinkedHashSet<>(notes)));
+        return new PublishResult(
+                true,
+                reviewReport.reviewAction(),
+                draftsToPublish.size(),
+                skippedFindings,
+                List.copyOf(new LinkedHashSet<>(notes))
+        );
     }
 
     static List<CommentDraft> buildCommentDrafts(ReviewReport reviewReport) {
@@ -116,6 +140,22 @@ public final class GitHubReviewPublisher {
             builder.append("   Why it matters: ").append(finding.whyItMatters()).append("\n");
             builder.append("   Recommendation: ").append(finding.recommendation()).append("\n");
             builder.append("   Confidence: ").append(String.format("%.2f", finding.confidence())).append("\n");
+        }
+        return builder.toString().stripTrailing();
+    }
+
+    static String renderReviewBody(ReviewReport reviewReport, List<CommentDraft> draftsToPublish) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(REVIEW_MARKER).append("\n");
+        builder.append("**AI review summary**\n\n");
+        builder.append("- Overall assessment: ").append(reviewReport.overallAssessment()).append('\n');
+        builder.append("- Review action: ").append(reviewReport.reviewAction().apiValue()).append('\n');
+        builder.append("- Inline findings published: ").append(draftsToPublish.stream().mapToInt(draft -> draft.findings().size()).sum()).append('\n');
+        builder.append('\n');
+        builder.append(reviewReport.summary());
+        if (!reviewReport.notes().isEmpty()) {
+            builder.append("\n\nNotes:\n");
+            reviewReport.notes().forEach(note -> builder.append("- ").append(note).append('\n'));
         }
         return builder.toString().stripTrailing();
     }
@@ -176,21 +216,32 @@ public final class GitHubReviewPublisher {
         }
     }
 
-    private void createReviewComment(int pullRequestNumber, String commitSha, CommentDraft draft) {
+    private void createReview(
+            int pullRequestNumber,
+            String commitSha,
+            ReviewReport reviewReport,
+            List<CommentDraft> draftsToPublish
+    ) {
         ObjectNode payload = ObjectMappers.json().createObjectNode();
-        payload.put("body", draft.body());
+        payload.put("body", renderReviewBody(reviewReport, draftsToPublish));
         payload.put("commit_id", commitSha);
-        payload.put("path", draft.path());
-        payload.put("line", draft.line());
-        payload.put("side", "RIGHT");
-        if (draft.startLine() < draft.line()) {
-            payload.put("start_line", draft.startLine());
-            payload.put("start_side", "RIGHT");
+        payload.put("event", reviewReport.reviewAction().githubEvent());
+        ArrayNode comments = payload.putArray("comments");
+        for (CommentDraft draft : draftsToPublish) {
+            ObjectNode comment = comments.addObject();
+            comment.put("body", draft.body());
+            comment.put("path", draft.path());
+            comment.put("line", draft.line());
+            comment.put("side", "RIGHT");
+            if (draft.startLine() < draft.line()) {
+                comment.put("start_line", draft.startLine());
+                comment.put("start_side", "RIGHT");
+            }
         }
 
         sendRequest(
                 "POST",
-                "/repos/%s/%s/pulls/%d/comments".formatted(
+                "/repos/%s/%s/pulls/%d/reviews".formatted(
                         urlEncode(gitHubConfig.owner()),
                         urlEncode(gitHubConfig.repo()),
                         pullRequestNumber
@@ -257,8 +308,15 @@ public final class GitHubReviewPublisher {
     record CommentFingerprint(String path, int startLine, int line, String commitSha, String body) {
     }
 
-    public record PublishResult(int publishedComments, int skippedFindings, List<String> notes) {
+    public record PublishResult(
+            boolean submittedReview,
+            ReviewAction reviewAction,
+            int publishedComments,
+            int skippedFindings,
+            List<String> notes
+    ) {
         public PublishResult {
+            reviewAction = reviewAction == null ? ReviewAction.COMMENT : reviewAction;
             notes = notes == null ? List.of() : List.copyOf(notes);
         }
     }
