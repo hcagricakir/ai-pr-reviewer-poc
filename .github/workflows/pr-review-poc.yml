@@ -4,6 +4,16 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
+    inputs:
+      pull_request_number:
+        description: Pull request number to review
+        required: true
+        type: string
+      base_branch:
+        description: Base branch name for metadata
+        required: false
+        default: main
+        type: string
 
 jobs:
   review:
@@ -25,17 +35,27 @@ jobs:
       - name: Build CLI
         run: ./mvnw -q -DskipTests package
 
+      - name: Resolve review context
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> "$GITHUB_ENV"
+            echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> "$GITHUB_ENV"
+          else
+            echo "PR_NUMBER=${{ inputs.pull_request_number }}" >> "$GITHUB_ENV"
+            echo "BASE_BRANCH=${{ inputs.base_branch }}" >> "$GITHUB_ENV"
+          fi
+
       - name: Run PR review
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPO_OWNER: ${{ github.repository_owner }}
           GITHUB_REPO_NAME: ${{ github.event.repository.name }}
-          GITHUB_BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          GITHUB_BASE_BRANCH: ${{ env.BASE_BRANCH }}
         run: |
           java -jar target/ai-pr-reviewer-poc.jar \
             review \
             --config config/application.example.yml \
-            --github-pr ${{ github.event.pull_request.number }} \
+            --github-pr "${PR_NUMBER}" \
             --provider openai \
             --output-format markdown
