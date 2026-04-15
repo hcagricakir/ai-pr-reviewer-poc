@@ -8,6 +8,7 @@ import dev.prreviewer.config.EnvironmentContext;
 import dev.prreviewer.diff.ReviewInput;
 import dev.prreviewer.diff.ReviewInputFilter;
 import dev.prreviewer.diff.ReviewInputLoader;
+import dev.prreviewer.github.GitHubReviewPublisher;
 import dev.prreviewer.output.OutputFormatterFactory;
 import dev.prreviewer.policy.PolicyLoader;
 import dev.prreviewer.policy.ResolvedPolicySet;
@@ -58,6 +59,12 @@ public final class ReviewCommand implements Callable<Integer> {
     @Option(names = "--dry-run", description = "Print the assembled prompts without calling the AI provider.")
     private boolean dryRun;
 
+    @Option(
+            names = "--publish-github-review-comments",
+            description = "Publish actionable findings as inline review comments on the target GitHub pull request."
+    )
+    private boolean publishGitHubReviewComments;
+
     @Override
     public Integer call() {
         validateSingleSourceSelection();
@@ -106,6 +113,19 @@ public final class ReviewCommand implements Callable<Integer> {
                 ? outputFormatOverride
                 : applicationConfig.review().outputFormat();
         System.out.println(new OutputFormatterFactory().create(outputFormat).format(report));
+
+        if (publishGitHubReviewComments) {
+            validateGitHubPublishInputs();
+            GitHubReviewPublisher.PublishResult publishResult = new GitHubReviewPublisher(applicationConfig.github())
+                    .publishInlineComments(githubPullRequest, report);
+            System.err.println(
+                    "Published %d inline GitHub review comments. Skipped %d findings."
+                            .formatted(publishResult.publishedComments(), publishResult.skippedFindings())
+            );
+            if (!publishResult.notes().isEmpty()) {
+                publishResult.notes().forEach(note -> System.err.println("GitHub publish note: " + note));
+            }
+        }
         return 0;
     }
 
@@ -161,6 +181,12 @@ public final class ReviewCommand implements Callable<Integer> {
             throw new IllegalArgumentException(
                     "Choose exactly one review input source: --diff-file, --changes-manifest, --github-pr, or --sample."
             );
+        }
+    }
+
+    private void validateGitHubPublishInputs() {
+        if (githubPullRequest == null) {
+            throw new IllegalArgumentException("--publish-github-review-comments requires --github-pr.");
         }
     }
 }
