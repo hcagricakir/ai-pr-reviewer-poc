@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public final class ReviewInputFilter {
 
@@ -52,9 +53,22 @@ public final class ReviewInputFilter {
     private boolean matches(String filePath, List<String> includePatterns, List<String> excludePatterns) {
         Path path = Path.of(filePath);
         boolean included = includePatterns == null || includePatterns.isEmpty() || includePatterns.stream()
-                .anyMatch(pattern -> FileSystems.getDefault().getPathMatcher("glob:" + pattern).matches(path));
+                .anyMatch(pattern -> matchesGlob(path, pattern));
         boolean excluded = excludePatterns != null && excludePatterns.stream()
-                .anyMatch(pattern -> FileSystems.getDefault().getPathMatcher("glob:" + pattern).matches(path));
+                .anyMatch(pattern -> matchesGlob(path, pattern));
         return included && !excluded;
+    }
+
+    private boolean matchesGlob(Path path, String pattern) {
+        return candidatePatterns(pattern)
+                .map(candidate -> FileSystems.getDefault().getPathMatcher("glob:" + candidate))
+                .anyMatch(pathMatcher -> pathMatcher.matches(path));
+    }
+
+    private Stream<String> candidatePatterns(String pattern) {
+        if (!pattern.startsWith("**/")) {
+            return Stream.of(pattern);
+        }
+        return Stream.of(pattern, pattern.substring(3));
     }
 }
