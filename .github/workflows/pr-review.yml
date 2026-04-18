@@ -3,16 +3,32 @@ name: PR Review
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
 
 jobs:
-  review:
+  review_on_pr_update:
+    if: ${{ github.event_name == 'pull_request' }}
     permissions:
       contents: read
       pull-requests: write
-    uses: hcagricakir/ai-pr-review-workflows/.github/workflows/pr-review.yml@v1
+    uses: hcagricakir/ai-pr-review-workflows/.github/workflows/pr-review.yml@main
     secrets: inherit
     with:
       review_profile: java-spring
       extra_rules_path: .github/review/business-rules.md
       reviewer_repo: hcagricakir/ai-pr-reviewer-poc
       reviewer_ref: ${{ github.event.pull_request.head.ref }}
+
+  review_on_comment:
+    if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '!review') }}
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: hcagricakir/ai-pr-review-workflows/.github/workflows/pr-review.yml@main
+    secrets: inherit
+    with:
+      review_profile: java-spring
+      extra_rules_path: .github/review/business-rules.md
+      reviewer_repo: hcagricakir/ai-pr-reviewer-poc
+      reviewer_ref: ""

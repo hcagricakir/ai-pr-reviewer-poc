@@ -144,3 +144,5 @@ The reusable workflow repository is expected to:
 This repository includes a caller workflow under `.github/workflows/pr-review.yml` so the engine can consume the shared workflow as a normal repository would.
 
 For this repository's own pull requests, the caller workflow points `reviewer_repo` to `hcagricakir/ai-pr-reviewer-poc` and uses the current pull request branch as `reviewer_ref`. That keeps the two-repository architecture intact while allowing the engine repository to validate its own in-flight changes through the shared reusable workflow before merge.
+
+The caller workflow also listens for `issue_comment` events on pull requests. When a comment contains `!review`, the shared workflow runs again against that pull request and resolves the pull request head branch as the effective reviewer ref. Because reusable workflow secrets and variables are read from the calling repository, `ai-pr-reviewer-poc` must define `OPENAI_API_KEY` as a repository secret and should define `OPENAI_MODEL` as a repository variable.
