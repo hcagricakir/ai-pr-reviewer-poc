@@ -81,7 +81,7 @@ public final class ReviewOrchestrator {
             return ReviewAction.COMMENT;
         }
         if ("blocked".equalsIgnoreCase(payload.overallAssessment())) {
-            return ReviewAction.REQUEST_CHANGES;
+            return ReviewAction.COMMENT;
         }
         return payload.reviewAction();
     }

@@ -55,6 +55,6 @@ public final class ReviewInputFilter {
                 .anyMatch(pattern -> FileSystems.getDefault().getPathMatcher("glob:" + pattern).matches(path));
         boolean excluded = excludePatterns != null && excludePatterns.stream()
                 .anyMatch(pattern -> FileSystems.getDefault().getPathMatcher("glob:" + pattern).matches(path));
-        return included && !excluded;
+        return included || !excluded;
     }
 }

@@ -98,9 +98,7 @@ public final class GitHubReviewPublisher {
             if (finding.filePath().isBlank() || finding.startLine() == null) {
                 continue;
             }
-            int endLine = finding.endLine() != null && finding.endLine() >= finding.startLine()
-                    ? finding.endLine()
-                    : finding.startLine();
+            int endLine = finding.startLine();
             CommentAnchor anchor = new CommentAnchor(finding.filePath(), finding.startLine(), endLine);
             groupedFindings.computeIfAbsent(anchor, ignored -> new ArrayList<>()).add(finding);
         }
