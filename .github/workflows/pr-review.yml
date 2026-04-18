@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    uses: hcagricakir/ai-pr-review-workflows/.github/workflows/pr-review.yml@v1.1
+    uses: hcagricakir/ai-pr-review-workflows/.github/workflows/pr-review.yml@main
     secrets: inherit
     with:
       review_profile: java-spring
@@ -25,7 +25,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    uses: hcagricakir/ai-pr-review-workflows/.github/workflows/pr-review.yml@v1.1
+    uses: hcagricakir/ai-pr-review-workflows/.github/workflows/pr-review.yml@main
     secrets: inherit
     with:
       review_profile: java-spring
