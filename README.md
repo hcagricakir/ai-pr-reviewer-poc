@@ -142,3 +142,5 @@ The reusable workflow repository is expected to:
 6. publish review comments back to GitHub
 
 This repository includes a caller workflow under `.github/workflows/pr-review.yml` so the engine can consume the shared workflow as a normal repository would.
+
+For this repository's own pull requests, the caller workflow points `reviewer_repo` to `hcagricakir/ai-pr-reviewer-poc` and uses the current pull request branch as `reviewer_ref`. That keeps the two-repository architecture intact while allowing the engine repository to validate its own in-flight changes through the shared reusable workflow before merge.

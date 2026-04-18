@@ -14,5 +14,5 @@ jobs:
     with:
       review_profile: java-spring
       extra_rules_path: .github/review/business-rules.md
-      reviewer_repo: hcagricakir/ai-pr-reviewer
-      reviewer_ref: main
+      reviewer_repo: hcagricakir/ai-pr-reviewer-poc
+      reviewer_ref: ${{ github.event.pull_request.head.ref }}
