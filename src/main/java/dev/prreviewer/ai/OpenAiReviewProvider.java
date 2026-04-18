@@ -45,6 +45,9 @@ public final class OpenAiReviewProvider implements AiReviewProvider {
         if (config.apiKey().isBlank()) {
             throw new IllegalArgumentException("OPENAI_API_KEY is missing. Configure it in .env or application.yml.");
         }
+        if (config.model().isBlank()) {
+            throw new IllegalArgumentException("OPENAI_MODEL is missing. Configure it in the environment or application.yml.");
+        }
 
         ObjectNode requestBody = ObjectMappers.json().createObjectNode();
         requestBody.put("model", config.model());

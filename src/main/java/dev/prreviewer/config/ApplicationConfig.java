@@ -86,7 +86,7 @@ public record ApplicationConfig(
         ) {
             this.apiKey = apiKey == null ? "" : apiKey;
             this.baseUrl = baseUrl == null ? "https://api.openai.com" : baseUrl;
-            this.model = model == null ? "gpt-5.4-mini" : model;
+            this.model = model == null ? "" : model;
             this.reasoningEffort = reasoningEffort == null ? "low" : reasoningEffort;
             this.timeoutSeconds = timeoutSeconds == null ? 90 : timeoutSeconds;
         }

@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.prreviewer</groupId>
-    <artifactId>ai-pr-reviewer-poc</artifactId>
+    <artifactId>ai-pr-reviewer</artifactId>
     <version>0.1.0-SNAPSHOT</version>
-    <name>AI PR Reviewer POC</name>
-    <description>Policy-driven AI pull request reviewer proof of concept for GitHub workflows.</description>
+    <name>AI PR Reviewer Engine</name>
+    <description>Policy-driven AI pull request review engine for reusable workflow integrations.</description>
 
     <properties>
         <maven.compiler.release>21</maven.compiler.release>

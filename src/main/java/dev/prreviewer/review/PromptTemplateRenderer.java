@@ -31,6 +31,17 @@ public final class PromptTemplateRenderer {
         return TextInterpolator.interpolateTemplate(template, values).trim();
     }
 
+    public String renderSystemPrompt(AgentProfile profile, ResolvedPolicySet policySet, Path extraRulesFile) {
+        String systemPrompt = renderSystemPrompt(profile, policySet);
+        String extraRules = readTemplate(extraRulesFile.toString()).trim();
+        if (extraRules.isBlank()) {
+            return systemPrompt;
+        }
+        return systemPrompt
+                + "\n\nSupplemental review rules:\n"
+                + extraRules;
+    }
+
     public String renderUserPrompt(dev.prreviewer.diff.ReviewInput reviewInput) {
         StringBuilder builder = new StringBuilder();
         builder.append("Review source: ").append(reviewInput.sourceType()).append('\n');
