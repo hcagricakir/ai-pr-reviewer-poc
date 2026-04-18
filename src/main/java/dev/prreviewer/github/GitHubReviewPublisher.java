@@ -28,8 +28,8 @@ import java.util.Set;
 
 public final class GitHubReviewPublisher {
 
-    static final String COMMENT_MARKER = "<!-- ai-pr-reviewer-poc -->";
-    static final String REVIEW_MARKER = "<!-- ai-pr-reviewer-poc-review -->";
+    static final String COMMENT_MARKER = "<!-- ai-pr-reviewer -->";
+    static final String REVIEW_MARKER = "<!-- ai-pr-reviewer-review -->";
     private static final String BOT_LOGIN = "github-actions[bot]";
 
     private final ApplicationConfig.GitHubConfig gitHubConfig;

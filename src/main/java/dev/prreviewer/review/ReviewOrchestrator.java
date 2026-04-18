@@ -5,6 +5,7 @@ import dev.prreviewer.config.AgentProfile;
 import dev.prreviewer.diff.ReviewInput;
 import dev.prreviewer.policy.ResolvedPolicySet;
 
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -19,7 +20,19 @@ public final class ReviewOrchestrator {
     }
 
     public ReviewContext prepareContext(ReviewInput reviewInput, AgentProfile agentProfile, ResolvedPolicySet policySet) {
+        return prepareContext(reviewInput, agentProfile, policySet, null);
+    }
+
+    public ReviewContext prepareContext(
+            ReviewInput reviewInput,
+            AgentProfile agentProfile,
+            ResolvedPolicySet policySet,
+            Path extraRulesFile
+    ) {
         String systemPrompt = promptTemplateRenderer.renderSystemPrompt(agentProfile, policySet);
+        if (extraRulesFile != null) {
+            systemPrompt = promptTemplateRenderer.renderSystemPrompt(agentProfile, policySet, extraRulesFile);
+        }
         String userPrompt = promptTemplateRenderer.renderUserPrompt(reviewInput);
         return new ReviewContext(systemPrompt, userPrompt, reviewInput, agentProfile, policySet);
     }
@@ -30,7 +43,17 @@ public final class ReviewOrchestrator {
             AgentProfile agentProfile,
             ResolvedPolicySet policySet
     ) {
-        ReviewContext context = prepareContext(reviewInput, agentProfile, policySet);
+        return review(provider, reviewInput, agentProfile, policySet, null);
+    }
+
+    public ReviewReport review(
+            AiReviewProvider provider,
+            ReviewInput reviewInput,
+            AgentProfile agentProfile,
+            ResolvedPolicySet policySet,
+            Path extraRulesFile
+    ) {
+        ReviewContext context = prepareContext(reviewInput, agentProfile, policySet, extraRulesFile);
         NormalizedReviewPayload payload = provider.review(context);
         List<ReviewFinding> findings = payload.findings().stream()
                 .filter(finding -> finding.confidence() >= agentProfile.review().minimumConfidence())

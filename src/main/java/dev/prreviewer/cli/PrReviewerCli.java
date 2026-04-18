@@ -4,7 +4,7 @@ import picocli.CommandLine.Command;
 
 @Command(
         name = "pr-reviewer",
-        description = "Policy-driven AI pull request reviewer proof of concept.",
+        description = "Policy-driven AI pull request review engine.",
         mixinStandardHelpOptions = true,
         subcommands = {ReviewCommand.class}
 )

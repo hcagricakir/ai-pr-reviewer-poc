@@ -56,6 +56,9 @@ public final class ReviewCommand implements Callable<Integer> {
     @Option(names = "--output-format", description = "Output format override. Supported: markdown, json.")
     private String outputFormatOverride;
 
+    @Option(names = "--extra-rules-file", description = "Path to supplemental markdown review rules to append to the system prompt.")
+    private Path extraRulesFile;
+
     @Option(names = "--dry-run", description = "Print the assembled prompts without calling the AI provider.")
     private boolean dryRun;
 
@@ -91,7 +94,13 @@ public final class ReviewCommand implements Callable<Integer> {
         }
 
         ReviewOrchestrator reviewOrchestrator = new ReviewOrchestrator(new PromptTemplateRenderer(projectRoot));
-        ReviewContext reviewContext = reviewOrchestrator.prepareContext(reviewInput, agentProfile, policySet);
+        Path resolvedExtraRulesFile = resolveExtraRulesPath(projectRoot);
+        ReviewContext reviewContext = reviewOrchestrator.prepareContext(
+                reviewInput,
+                agentProfile,
+                policySet,
+                resolvedExtraRulesFile
+        );
 
         if (dryRun) {
             System.out.println("# System Prompt\n");
@@ -106,7 +115,8 @@ public final class ReviewCommand implements Callable<Integer> {
                 new AiProviderFactory().create(providerName, applicationConfig),
                 reviewInput,
                 agentProfile,
-                policySet
+                policySet,
+                resolvedExtraRulesFile
         );
 
         String outputFormat = outputFormatOverride != null
@@ -179,6 +189,13 @@ public final class ReviewCommand implements Callable<Integer> {
                 ? applicationConfig.review().agentProfile()
                 : agentProfilePath;
         return projectRoot.resolve(profileLocation).normalize();
+    }
+
+    private Path resolveExtraRulesPath(Path projectRoot) {
+        if (extraRulesFile == null) {
+            return null;
+        }
+        return projectRoot.resolve(extraRulesFile).normalize();
     }
 
     private void validateSingleSourceSelection() {
