@@ -46,6 +46,31 @@ case "${SCENARIO}" in
       "${REPO_ROOT}/demo/scenarios/null-edge-case/${VARIANT}/CustomerLookupService.java" \
       "${DESTINATION_ROOT}/src/main/java/com/acme/customer/CustomerLookupService.java"
     ;;
+  controller-validation-regression)
+    copy_or_remove \
+      "${REPO_ROOT}/demo/scenarios/controller-validation-regression/${VARIANT}/PaymentController.java" \
+      "${DESTINATION_ROOT}/src/main/java/com/acme/payment/PaymentController.java"
+    ;;
+  dto-contract-regression)
+    copy_or_remove \
+      "${REPO_ROOT}/demo/scenarios/dto-contract-regression/${VARIANT}/ClientController.java" \
+      "${DESTINATION_ROOT}/src/main/java/com/acme/client/ClientController.java"
+    ;;
+  silent-update-failure)
+    copy_or_remove \
+      "${REPO_ROOT}/demo/scenarios/silent-update-failure/${VARIANT}/ClientActivationService.java" \
+      "${DESTINATION_ROOT}/src/main/java/com/acme/client/ClientActivationService.java"
+    ;;
+  transactional-event-regression)
+    copy_or_remove \
+      "${REPO_ROOT}/demo/scenarios/transactional-event-regression/${VARIANT}/InvoiceApprovalService.java" \
+      "${DESTINATION_ROOT}/src/main/java/com/acme/invoice/InvoiceApprovalService.java"
+    ;;
+  raw-topic-regression)
+    copy_or_remove \
+      "${REPO_ROOT}/demo/scenarios/raw-topic-regression/${VARIANT}/OrderEventPublisher.java" \
+      "${DESTINATION_ROOT}/src/main/java/com/acme/order/OrderEventPublisher.java"
+    ;;
   responsibility-violation)
     copy_or_remove \
       "${REPO_ROOT}/demo/scenarios/responsibility-violation/${VARIANT}/OrderPlacementService.java" \

@@ -1,0 +1,9 @@
+scenario:
+  id: controller-validation-regression
+  title: Controller validation regression
+  description: Removes boundary validation from a Spring controller and weakens a previously typed request contract.
+
+changes:
+  - path: src/main/java/com/acme/payment/PaymentController.java
+    base: base/PaymentController.java
+    head: head/PaymentController.java

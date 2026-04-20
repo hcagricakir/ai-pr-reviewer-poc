@@ -103,6 +103,20 @@ Run against a sample:
 java -jar target/ai-pr-reviewer.jar review --sample naming-problem
 ```
 
+High-signal samples for validating the shared review workflow:
+
+- `controller-validation-regression`: Spring controller drops boundary validation and weakens a typed request contract.
+- `dto-contract-regression`: Controller switches from a DTO response to exposing a persistence entity directly.
+- `silent-update-failure`: Service stops checking affected-row count and can report success on a missing record.
+- `transactional-event-regression`: Multi-step approval flow loses its transaction and publishes side effects before persistence.
+- `raw-topic-regression`: Kafka publisher replaces centralized topic constants with a hard-coded environment-specific topic.
+
+Materialize a sample into a scratch directory for manual diff inspection:
+
+```bash
+bash scripts/materialize-demo-scenario.sh controller-validation-regression head /tmp/review-sample
+```
+
 Run against a pull request:
 
 ```bash

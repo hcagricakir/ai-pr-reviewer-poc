@@ -1,0 +1,9 @@
+scenario:
+  id: silent-update-failure
+  title: Silent persistence failure
+  description: Drops the affected-row guard on an update path and reports success even when nothing was changed.
+
+changes:
+  - path: src/main/java/com/acme/client/ClientActivationService.java
+    base: base/ClientActivationService.java
+    head: head/ClientActivationService.java

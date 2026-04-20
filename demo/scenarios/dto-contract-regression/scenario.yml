@@ -1,0 +1,9 @@
+scenario:
+  id: dto-contract-regression
+  title: DTO contract regression
+  description: Changes a controller from returning a stable DTO to exposing a persistence entity directly.
+
+changes:
+  - path: src/main/java/com/acme/client/ClientController.java
+    base: base/ClientController.java
+    head: head/ClientController.java

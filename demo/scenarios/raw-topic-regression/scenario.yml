@@ -1,0 +1,9 @@
+scenario:
+  id: raw-topic-regression
+  title: Raw Kafka topic regression
+  description: Replaces centralized topic constants with a hard-coded environment-specific topic string.
+
+changes:
+  - path: src/main/java/com/acme/order/OrderEventPublisher.java
+    base: base/OrderEventPublisher.java
+    head: head/OrderEventPublisher.java

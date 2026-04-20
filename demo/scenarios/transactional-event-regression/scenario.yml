@@ -1,0 +1,9 @@
+scenario:
+  id: transactional-event-regression
+  title: Transaction and event ordering regression
+  description: Moves event publication ahead of persistence and removes the transactional boundary from a multi-step approval flow.
+
+changes:
+  - path: src/main/java/com/acme/invoice/InvoiceApprovalService.java
+    base: base/InvoiceApprovalService.java
+    head: head/InvoiceApprovalService.java
