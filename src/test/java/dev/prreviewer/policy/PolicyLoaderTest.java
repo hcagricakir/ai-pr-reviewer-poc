@@ -33,6 +33,6 @@ class PolicyLoaderTest {
                 .contains("null-and-edge-handling", "optional-usage");
         assertThat(policySet.severityMapping()).containsEntry("high", "Likely bug, regression, or materially unsafe behavior. Should be fixed before merge.");
         assertThat(policySet.outputContract().allowedReviewActions()).containsExactly("comment", "request_changes");
-        assertThat(policySet.outputContract().requiredFields()).contains("severity", "title", "recommendation");
+        assertThat(policySet.outputContract().requiredFields()).contains("severity", "title", "problem");
     }
 }

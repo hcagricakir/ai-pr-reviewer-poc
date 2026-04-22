@@ -29,9 +29,12 @@ public final class MarkdownReviewOutputFormatter implements ReviewOutputFormatte
                 builder.append("  - File: ").append(finding.filePath()).append('\n');
                 builder.append("  - Line: ").append(renderLineReference(finding)).append('\n');
                 builder.append("  - Problem: ").append(finding.problem()).append('\n');
-                builder.append("  - Why it matters: ").append(finding.whyItMatters()).append('\n');
-                builder.append("  - Recommendation: ").append(finding.recommendation()).append('\n');
-                builder.append("  - Confidence: ").append(String.format("%.2f", finding.confidence())).append('\n');
+                if (!finding.codeSuggestion().isBlank()) {
+                    builder.append('\n');
+                    builder.append("```suggestion\n");
+                    builder.append(finding.codeSuggestion()).append('\n');
+                    builder.append("```\n");
+                }
             }
         }
 

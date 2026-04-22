@@ -38,9 +38,6 @@
           "severity",
           "title",
           "problem",
-          "whyItMatters",
-          "recommendation",
-          "confidence",
           "filePath",
           "startLine",
           "endLine"
@@ -62,11 +59,11 @@
           "problem": {
             "type": "string"
           },
-          "whyItMatters": {
-            "type": "string"
-          },
-          "recommendation": {
-            "type": "string"
+          "codeSuggestion": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "confidence": {
             "type": "number",

@@ -19,8 +19,7 @@ class GitHubReviewPublisherTest {
                 Severity.HIGH,
                 "Null guard regression",
                 "Null can reach compareTo.",
-                "This changes the method contract.",
-                "Restore the null check.",
+                "",
                 0.99,
                 "src/main/java/example/Foo.java",
                 6,
@@ -30,8 +29,7 @@ class GitHubReviewPublisherTest {
                 Severity.MEDIUM,
                 "Naming issue",
                 "Variable name is vague.",
-                "It hurts readability.",
-                "Rename the variable.",
+                "",
                 0.70,
                 "src/main/java/example/Foo.java",
                 6,
@@ -41,8 +39,7 @@ class GitHubReviewPublisherTest {
                 Severity.LOW,
                 "No anchor",
                 "No line information.",
-                "Cannot publish inline.",
-                "Add line context.",
+                "",
                 0.60,
                 "src/main/java/example/Foo.java",
                 null,
@@ -77,8 +74,7 @@ class GitHubReviewPublisherTest {
                 Severity.HIGH,
                 "Null guard regression",
                 "Null can reach compareTo.",
-                "This changes the method contract.",
-                "Restore the null check.",
+                "if (value == null) {\n    return;\n}",
                 0.99,
                 "src/main/java/example/Foo.java",
                 6,
@@ -89,8 +85,10 @@ class GitHubReviewPublisherTest {
 
         assertThat(body).contains(GitHubReviewPublisher.COMMENT_MARKER);
         assertThat(body).contains("**[high] Null guard regression**");
-        assertThat(body).contains("Problem: Null can reach compareTo.");
-        assertThat(body).contains("Confidence: 0.99");
+        assertThat(body).contains("Null can reach compareTo.");
+        assertThat(body).contains("```suggestion");
+        assertThat(body).doesNotContain("Why it matters:");
+        assertThat(body).doesNotContain("Confidence:");
     }
 
     @Test
@@ -99,8 +97,7 @@ class GitHubReviewPublisherTest {
                 Severity.HIGH,
                 "Null guard regression",
                 "Null can reach compareTo.",
-                "This changes the method contract.",
-                "Restore the null check.",
+                "",
                 0.99,
                 "src/main/java/example/Foo.java",
                 6,
