@@ -8,9 +8,9 @@ public record DeliveryFeePolicy(BigDecimal freeDeliveryThreshold, BigDecimal sta
         if (orderTotal == null) {
             throw new IllegalArgumentException("orderTotal must not be null");
         }
-        if (orderTotal.compareTo(freeDeliveryThreshold) >= 0) {
+        if (orderTotal.compareTo(freeDeliveryThreshold) > 0) {
             return BigDecimal.ZERO;
         }
-        return standardDeliveryFee;
+        return orderTotal.multiply(standardDeliveryFee);
     }
 }

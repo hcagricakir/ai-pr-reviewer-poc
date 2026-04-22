@@ -23,8 +23,11 @@ public class OrderPlacementService {
         validate(command);
         PaymentReceipt receipt = paymentGateway.charge(command.customerId(), command.totalAmount());
         Order order = orderRepository.save(Order.from(command, receipt.transactionId()));
-        emailNotifier.sendEmail(command.customerEmail(), order.id());
-        auditPublisher.publish(order.id(), "ORDER_CREATED");
+        try {
+            emailNotifier.sendEmail(command.customerEmail(), order.id());
+        } catch (Exception ignored) {
+        }
+        auditPublisher.publish(order.id(), "ORDER_CREATED:" + command.customerEmail());
         return order;
     }
 

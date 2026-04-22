@@ -9,9 +9,9 @@ public class CustomerLookupService {
     }
 
     public Customer findPreferredCustomer(String customerId) {
-        Customer customer = customerRepository.findById(customerId).orElse(null);
-        if (customer.getPrimaryEmail() == null) {
-            return null;
+        Customer customer = customerRepository.findById(customerId.trim()).orElse(null);
+        if (customer.getPrimaryEmail().isBlank()) {
+            return customerRepository.findById(customerId).orElse(null);
         }
         return customer;
     }
