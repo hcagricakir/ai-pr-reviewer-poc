@@ -124,10 +124,8 @@ public final class GitHubReviewPublisher {
         if (findings.size() == 1) {
             ReviewFinding finding = findings.getFirst();
             builder.append("**[").append(finding.severity().apiValue()).append("] ").append(finding.title()).append("**\n\n");
-            builder.append("Problem: ").append(finding.problem()).append("\n\n");
-            builder.append("Why it matters: ").append(finding.whyItMatters()).append("\n\n");
-            builder.append("Recommendation: ").append(finding.recommendation()).append("\n\n");
-            builder.append("Confidence: ").append(String.format("%.2f", finding.confidence()));
+            builder.append(finding.problem());
+            appendSuggestionBlock(builder, finding.codeSuggestion(), "");
             return builder.toString();
         }
 
@@ -136,12 +134,22 @@ public final class GitHubReviewPublisher {
             ReviewFinding finding = findings.get(index);
             builder.append(index + 1).append(". **[").append(finding.severity().apiValue()).append("] ")
                     .append(finding.title()).append("**\n");
-            builder.append("   Problem: ").append(finding.problem()).append("\n");
-            builder.append("   Why it matters: ").append(finding.whyItMatters()).append("\n");
-            builder.append("   Recommendation: ").append(finding.recommendation()).append("\n");
-            builder.append("   Confidence: ").append(String.format("%.2f", finding.confidence())).append("\n");
+            builder.append("   ").append(finding.problem()).append("\n");
+            appendSuggestionBlock(builder, finding.codeSuggestion(), "   ");
         }
         return builder.toString().stripTrailing();
+    }
+
+    private static void appendSuggestionBlock(StringBuilder builder, String codeSuggestion, String indent) {
+        if (codeSuggestion == null || codeSuggestion.isBlank()) {
+            return;
+        }
+        builder.append("\n\n");
+        builder.append(indent).append("```suggestion\n");
+        for (String line : codeSuggestion.stripTrailing().split("\\R", -1)) {
+            builder.append(indent).append(line).append('\n');
+        }
+        builder.append(indent).append("```");
     }
 
     static String renderReviewBody(ReviewReport reviewReport, List<CommentDraft> draftsToPublish) {

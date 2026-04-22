@@ -12,9 +12,6 @@ outputContract:
     - severity
     - title
     - problem
-    - whyItMatters
-    - recommendation
-    - confidence
     - filePath
     - startLine
     - endLine

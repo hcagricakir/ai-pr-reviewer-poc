@@ -111,8 +111,9 @@ public final class PromptTemplateRenderer {
                 List.of(
                         "- Summary style: " + contract.summaryStyle(),
                         "- No finding behavior: " + contract.noFindingBehavior(),
-                        "- Confidence scale: " + contract.confidenceScale(),
                         "- Required fields: " + String.join(", ", contract.requiredFields()),
+                        "- Optional fields: codeSuggestion, confidence",
+                        "- Confidence scale: " + contract.confidenceScale(),
                         "- Line references: " + contract.lineReferenceGuidance(),
                         "- Allowed review actions: " + String.join(", ", contract.allowedReviewActions()),
                         "- Review action guidance: " + contract.reviewActionGuidance()
