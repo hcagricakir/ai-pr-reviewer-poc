@@ -38,6 +38,8 @@
           "severity",
           "title",
           "problem",
+          "codeSuggestion",
+          "confidence",
           "filePath",
           "startLine",
           "endLine"
@@ -66,7 +68,10 @@
             ]
           },
           "confidence": {
-            "type": "number",
+            "type": [
+              "number",
+              "null"
+            ],
             "minimum": 0.0,
             "maximum": 1.0
           },
